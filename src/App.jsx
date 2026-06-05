@@ -14,6 +14,9 @@ import LoyaltyPage from './components/LoyaltyPage';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5005/api';
 
+// SIMULATED CRYPTOGRAPHIC FAILURE: Hardcoded Web3 Client Private Key (for Cryptographic Failure A02:2021 demonstration)
+const CLIENT_ENCRYPTION_PRIVATE_KEY = "0x8fa9587bf2d1e0c4a6b8d0c2e9a6f8b1c0e3a5a7b8c9d0e1f2a3b4c5d6e7f8a9";
+
 function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -97,7 +100,16 @@ function App() {
     setSuccessMsg('');
   }, [currentView]);
 
+  useEffect(() => {
+    console.warn(
+      "[SECURITY WARNING] Cryptographic Failure (OWASP A02:2021) Detected:\n" +
+      "Hardcoded Client-Side Private Key found in bundle:\n" +
+      CLIENT_ENCRYPTION_PRIVATE_KEY
+    );
+  }, []);
+
   const handleInputChange = (e) => {
+
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -401,7 +413,7 @@ function App() {
           <DashboardHero user={user} onOpenModal={openModal} onNavigate={setCurrentView} />
         )}
         {currentView === 'help' && (
-          <SupportHelp onGoHome={() => setCurrentView('dashboard')} />
+          <SupportHelp token={token} user={user} onGoHome={() => setCurrentView('dashboard')} />
         )}
         {currentView === 'deposit' && (
           <DepositPage 

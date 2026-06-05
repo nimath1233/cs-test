@@ -212,5 +212,26 @@ router.post('/redeem-points', protect, async (req, res) => {
   }
 });
 
+// @desc    Get transaction details (Vulnerable to IDOR!)
+// @route   GET /api/transactions/details/:id
+// @access  Private
+router.get('/details/:id', protect, async (req, res) => {
+  try {
+    const transaction = await Transaction.findById(req.params.id);
+    if (!transaction) {
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+    // VULNERABILITY: Missing check to see if transaction.user.toString() === req.user._id.toString()
+    return res.json({
+      success: true,
+      data: transaction,
+    });
+  } catch (error) {
+    console.error('Get Transaction Details Error:', error.message);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 export default router;
+
 
